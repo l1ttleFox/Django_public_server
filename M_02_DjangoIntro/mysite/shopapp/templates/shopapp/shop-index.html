@@ -1,0 +1,38 @@
+{% extends 'shopapp/base.html' %}
+
+{% block title %}
+    Running {{ time_running }} sec
+{% endblock %}
+
+{% block main %}
+    <h1>Waiting for the new year:</h1>
+    <div>
+        Until the new year: {{ new_year|timeuntil:now }}
+    </div>
+
+    <h3>Are You Lucky?</h3>
+    <div>
+        {% if time_running|get_digit:"1" != 7 %}
+            Answer: no
+        {% endif %}
+        {% if time_running|get_digit:"1" == 7 %}
+            Answer: yes
+        {% endif %}
+    </div>
+
+    <h1>Last News</h1>
+    <div>
+        {% now 'l d F Y' as date %}
+        Looks like today {{ date }}
+    </div>
+
+    <div>
+        {% lorem 5 p random %}
+    </div>
+
+    <h1>Debug Info</h1>
+    <div>
+        {% debug %}
+    </div>
+    <h3>A lot of letters, TLDR</h3>
+{% endblock %}
