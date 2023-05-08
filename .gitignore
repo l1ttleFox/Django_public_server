@@ -131,3 +131,4 @@ dmypy.json
 
 # Jetbrains Intellij IDEA
 .idea/
+/M_04_DjangoAdmin/mysite/shopapp/migrations/
