@@ -11,8 +11,9 @@
     {% for product in products %}
       <div>
         <p>Name: {{ product.name }}</p>
-        <p>Price: {{ product.price }}</p>
-        <p>Discount: {% firstof product.discount 'no discount' %}</p>
+        <p>Price: {{ product.price }} $</p>
+        <p>Discount: {% firstof product.discount 'no discount' %} %</p>
+        <br>
       </div>
     {% endfor %}
 
@@ -21,4 +22,10 @@
   {% else %}
     <h3>No products yet</h3>
   {% endif %}
+
+  <div>
+    <a href={% url 'shopapp:create_product' %}>
+      Create a new product
+    </a>
+  </div>
 {% endblock %}
