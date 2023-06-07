@@ -44,6 +44,7 @@ def orders_list(request: HttpRequest) -> HttpResponse:
 
 
 def create_product(request: HttpRequest) -> HttpResponse:
+    """ View функция создания нового продукта. """
     if request.method == "POST":
         form = ProductForm(request.POST)
         if form.is_valid():
@@ -59,6 +60,7 @@ def create_product(request: HttpRequest) -> HttpResponse:
 
 
 def create_order(request: HttpRequest) -> HttpResponse:
+    """ View функция создания нового заказа. """
     if request.method == "POST":
         form = OrderForm(request.POST)
         if form.is_valid():
