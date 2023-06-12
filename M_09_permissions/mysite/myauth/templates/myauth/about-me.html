@@ -14,6 +14,8 @@
     <p>Last name: {{ user.last_name }}</p>
     <p>Email: {{ user.email }}</p>
     <p>Bio: {{ user.profile.bio }}</p>
+    <p>Age: {{ user.profile.age }}</p>
+    <p>Delivery address: {{ user.profile.delivery_address }}</p>
   {% else %}
     <h2>User is anonymous</h2>
   {% endif %}

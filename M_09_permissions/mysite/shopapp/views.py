@@ -1,8 +1,9 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.shortcuts import render, reverse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 
 from .models import Product, Order
 
@@ -27,12 +28,23 @@ class ProductsListView(ListView):
 
 
 class ProductCreateView(CreateView):
+    """ CBV для создания продукта. """
+    
     model = Product
     fields = "name", "price", "description", "discount"
     success_url = reverse_lazy("shopapp:products_list")
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(UserPassesTestMixin, PermissionRequiredMixin, UpdateView):
+    """ CBV для изменения продукта. Для авторизации требуются соответствующие разрешения. """
+    
+    def test_func(self):
+        return (self.request.user == self.get_object().created_by) or self.request.user.is_superuser
+    permission_required = "shopapp.change_product"
     model = Product
     fields = "name", "price", "description", "discount"
     template_name_suffix = "_update_form"
@@ -69,3 +81,9 @@ class OrderDetailView(DetailView):
         .select_related("user")
         .prefetch_related("products")
     )
+
+
+class IndexView(TemplateView):
+    """ CBV для корня сайта """
+    
+    template_name = "home_page/home_page.html"
