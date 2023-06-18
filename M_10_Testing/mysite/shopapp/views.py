@@ -1,10 +1,10 @@
 from timeit import default_timer
 
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, reverse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from .models import Product, Order
@@ -81,3 +81,33 @@ class OrderDetailView(PermissionRequiredMixin, DetailView):
         .select_related("user")
         .prefetch_related("products")
     )
+
+
+class OrderExportView(PermissionRequiredMixin, View):
+    """ CBV для экспорта всех заказов. """
+    
+    permission_required = "shopapp.view_order"
+    
+    def get(self, request: HttpRequest) -> JsonResponse:
+        all_orders = [
+            {
+                "delivery_address": order.delivery_address,
+                "promocode": order.promocode,
+                "user": order.user,
+                "products": [i_product.name for i_product in order.products]
+            }
+            for order in Order.objects.order_by("pk").all()
+        ]
+        return JsonResponse({"orders": all_orders})
+
+
+class IndexView(TemplateView):
+    """ CBV для корня сайта """
+    
+    template_name = "home_page/home_page.html"
+    
+    
+class OrderCreateView(CreateView):
+    model = Order
+    fields = "delivery_address", "promocode", "user", "products"
+    success_url = reverse_lazy("shopapp:orders_list")
