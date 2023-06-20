@@ -1,12 +1,14 @@
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
+from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
-from django.urls import reverse_lazy
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy, reverse
 from django.views import View
-from django.views.generic import TemplateView, CreateView
-
+from django.views.generic import TemplateView, CreateView, UpdateView, ListView, DetailView
 from .models import Profile
 
 
@@ -64,3 +66,45 @@ def get_session_view(request: HttpRequest) -> HttpResponse:
 class FooBarView(View):
     def get(self, request: HttpRequest) -> JsonResponse:
         return JsonResponse({"foo": "bar", "spam": "eggs"})
+
+
+class ProfileUpdateView(UpdateView):
+    """ CBV для обновления профиля. """
+    
+    model = Profile
+    fields = "bio", "avatar"
+    template_name_suffix = "_update"
+    
+    def get_success_url(self):
+        return reverse("myauth:about-me")
+    
+    def get(self, request, *args, **kwargs):
+        print(self.get_object().pk)
+        print(request.user.pk)
+        if request.user.is_staff or (self.get_object().user.pk == request.user.pk):
+            return super().get(request, args, kwargs)
+        else:
+            raise PermissionDenied
+
+    
+def about_me_update_redirect_view(request: HttpRequest) -> HttpResponse:
+    """ View-функция для редиректа с about-me/update на уникальную ссылку."""
+    
+    return redirect(reverse("myauth:update_profile", kwargs={"pk": request.user.profile.pk}))
+
+
+class UserListView(ListView):
+    """ CBV для отображения списка пользователей. """
+    
+    template_name = 'myauth/user_list.html'
+    model = User
+    context_object_name = "users"
+    
+    
+class UserDetailView(DetailView):
+    """ CBV для отображения деталей пользователя. """
+    
+    template_name = 'myauth/user_details.html'
+    model = User
+    context_object_name = "user_details"
+    
