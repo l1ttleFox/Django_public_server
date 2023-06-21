@@ -1,22 +1,28 @@
 {% extends 'shopapp/base.html' %}
 
+{% load i18n %}
+
 {% block title %}
-  Product #{{ product.pk }}
+  {% translate "Product" %} #{{ product.pk }}
 {% endblock %}
 
 {% block body %}
-  <h1>Product <strong>{{ product.name }}</strong></h1>
-  <div>
-    <div>Description: <em>{{ product.description }}</em></div>
-    <div>Price: {{ product.price }}</div>
-    <div>Discount: {{ product.discount }}</div>
-    <div>Archived: {{ product.archived }}</div>
-
+    <h1>{% translate "Product" %} <strong>{{ product.name }}</strong></h1>
+    <div>
+    {% blocktranslate %}
+      <div>Description: <em>{{ product.description }}</em></div>
+      <div>Price: {{ product.price }}</div>
+      <div>Discount: {{ product.discount }}</div>
+      <div>Archived: {{ product.archived }}</div>
+    {% endblocktranslate %}
     {% if product.preview %}
       <img src="{{ product.preview.url }}" alt="{{ product.preview.name }}">
     {% endif %}
-
-    <h3>Images:</h3>
+    {% blocktranslate count images=product.images.all.count %}
+      <h3>One image available:</h3>
+    {% plural %}
+      <h3>{{ images }} images available:</h3>
+    {% endblocktranslate %}
     <div>
       {% for img in product.images.all %}
         <div>
@@ -24,18 +30,18 @@
           <div>{{ img.description }}</div>
         </div>
       {% empty %}
-        <div>No images uploaded yet</div>
+        <div>{% translate "No images uploaded yet" %}</div>
       {% endfor %}
 
     </div>
   </div>
   <div>
-    <a href="{% url 'shopapp:product_update' pk=product.pk %}">Update product</a>
+    <a href="{% url 'shopapp:product_update' pk=product.pk %}">{% translate "Update product" %}</a>
   </div>
   <div>
-    <a href="{% url 'shopapp:product_delete' pk=product.pk %}">Archive product</a>
+    <a href="{% url 'shopapp:product_delete' pk=product.pk %}">{% translate "Archive product" %}</a>
   </div>
   <div>
-    <a href="{% url 'shopapp:products_list' %}">Back to products list</a>
+    <a href="{% url 'shopapp:products_list' %}">{% translate "Back to products list" %}</a>
   </div>
 {% endblock %}

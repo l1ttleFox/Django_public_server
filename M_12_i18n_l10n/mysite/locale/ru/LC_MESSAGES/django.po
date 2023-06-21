@@ -1,0 +1,100 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-06-21 17:32+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: mysite/settings.py:129
+msgid "Russian"
+msgstr "Русский"
+
+#: mysite/settings.py:130
+msgid "English"
+msgstr "Английский"
+
+#: shopapp/models.py:16 shopapp/templates/shopapp/products-details.html:6
+#: shopapp/templates/shopapp/products-details.html:10
+msgid "Product"
+msgstr "Товар"
+
+#: shopapp/models.py:17
+msgid "Products"
+msgstr "Товары"
+
+#: shopapp/models.py:46
+msgid "Order"
+msgstr "Заказ"
+
+#: shopapp/models.py:47
+msgid "Orders"
+msgstr "Заказы"
+
+#: shopapp/templates/shopapp/products-details.html:12
+#, python-format
+msgid ""
+"\n"
+"      <div>Description: <em>%(product.description)s</em></div>\n"
+"      <div>Price: %(product.price)s</div>\n"
+"      <div>Discount: %(product.discount)s</div>\n"
+"      <div>Archived: %(product.archived)s</div>\n"
+"    "
+msgstr ""
+"\n"
+"      <div>Описание: <em>%(product.description)s</em></div>\n"
+"      <div>Цена: %(product.price)s</div>\n"
+"      <div>Скидка: %(product.discount)s</div>\n"
+"      <div>Архивирован: %(product.archived)s</div>\n"
+"    "
+
+msgid ""
+"\n"
+"      <h3>One image available:</h3>\n"
+"    "
+msgid_plural ""
+"\n"
+"      <h3>%(images)s images available:</h3>\n"
+"    "
+msgstr[0] ""
+"\n"
+"      <h3>%(images)s изображение доступно:</h3>\n"
+"    "
+msgstr[1] ""
+"\n"
+"      <h3>%(images)s изображения доступно:</h3>\n"
+"    "
+msgstr[2] ""
+"\n"
+"      <h3>%(images)s изображений доступно:</h3>\n"
+"    "
+
+#: shopapp/templates/shopapp/products-details.html:33
+msgid "No images uploaded yet"
+msgstr "Изображения еще не загружены"
+
+#: shopapp/templates/shopapp/products-details.html:39
+msgid "Update product"
+msgstr "Изменить товар"
+
+#: shopapp/templates/shopapp/products-details.html:42
+msgid "Archive product"
+msgstr "Архивировать товар"
+
+#: shopapp/templates/shopapp/products-details.html:45
+msgid "Back to products list"
+msgstr "Назад к списку товаров"
