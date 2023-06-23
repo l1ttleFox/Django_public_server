@@ -4,11 +4,16 @@ from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonRes
 from django.shortcuts import render, reverse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 from .forms import ProductForm
 from .models import Product, Order, ProductImage
+
+from .serializers import ProductSerializer, OrderSerializer
+from rest_framework.viewsets import ModelViewSet
 
 
 class ShopIndexView(View):
@@ -50,13 +55,13 @@ class ProductUpdateView(UpdateView):
     # fields = "name", "price", "description", "discount", "preview"
     template_name_suffix = "_update_form"
     form_class = ProductForm
-
+    
     def get_success_url(self):
         return reverse(
             "shopapp:product_details",
             kwargs={"pk": self.object.pk},
         )
-
+    
     def form_valid(self, form):
         response = super().form_valid(form)
         for image in form.files.getlist("images"):
@@ -64,14 +69,14 @@ class ProductUpdateView(UpdateView):
                 product=self.object,
                 image=image,
             )
-
+        
         return response
 
 
 class ProductDeleteView(DeleteView):
     model = Product
     success_url = reverse_lazy("shopapp:products_list")
-
+    
     def form_valid(self, form):
         success_url = self.get_success_url()
         self.object.archived = True
@@ -109,3 +114,59 @@ class ProductsDataExportView(View):
             for product in products
         ]
         return JsonResponse({"products": products_data})
+
+
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    filter_backends = [
+        SearchFilter,
+        OrderingFilter,
+    ]
+    search_fields = [
+        "pk",
+        "name",
+        "description",
+        "price",
+        "discount",
+        "created_at",
+        "archived",
+    ]
+    ordering_fields = [
+        "pk",
+        "name",
+        "description",
+        "price",
+        "discount",
+        "created_at",
+        "archived",
+    ]
+
+
+class OrderViewSet(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    filter_backends = [
+        DjangoFilterBackend,
+        OrderingFilter,
+    ]
+    filterset_fields = [
+        "delivery_address",
+        "promocode",
+        "created_at",
+        "user",
+        "products"
+    ]
+    ordering_fields = [
+        "pk",
+        "delivery_address",
+        "promocode",
+        "created_at",
+        "user",
+    ]
+
+
+class IndexView(TemplateView):
+    """ CBV для корня сайта """
+    
+    template_name = "home_page/home_page.html"
