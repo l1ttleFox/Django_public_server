@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
+    'django.contrib.sitemaps',
 
     'shopapp.apps.ShopappConfig',
     'myauth.apps.MyauthConfig',

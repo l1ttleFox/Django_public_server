@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Manager
+from django.urls import reverse
 
 
 def product_preview_directory_path(instance: "Product", filename: str) -> str:
@@ -26,9 +27,13 @@ class Product(models.Model):
 
     def __str__(self):
         return f"Product(pk={self.pk}, name={self.name!r})"
-
+    
+    def get_absolute_url(self):
+        return reverse("shopapp:product_details", kwargs={"pk": self.pk})
+        
     if TYPE_CHECKING:
         objects: Manager
+
 
 def product_images_directory_path(instance: "ProductImage", filename: str) -> str:
     return "products/product_{pk}/images/{filename}".format(
@@ -49,4 +54,4 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     products = models.ManyToManyField(Product, related_name="orders")
-    receipt = models.FileField(null=True, upload_to='orders/receipts/')
+    receipt = models.FileField(null=True, upload_to='orders/receipts/', default=None)

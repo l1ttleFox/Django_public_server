@@ -1,5 +1,6 @@
 from timeit import default_timer
 
+from django.contrib.syndication.views import Feed
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, reverse
 from django.urls import reverse_lazy
@@ -135,3 +136,20 @@ class ProductsDataExportView(View):
             for product in products
         ]
         return JsonResponse({"products": products_data})
+    
+
+class LatestProductFeed(Feed):
+    """ Лента обновления продуктов. """
+    
+    title = "My site Products"
+    description = "Updates every 3rd second of march"
+    link = reverse_lazy("shopapp:products_list")
+    
+    def items(self):
+        return Product.objects.filter(archived=False).order_by("-created_at")[:5]
+    
+    def item_title(self, item):
+        return item.name
+    
+    def item_description(self, item):
+        return item.description
