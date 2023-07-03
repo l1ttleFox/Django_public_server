@@ -1,11 +1,12 @@
 from csv import DictWriter
 from timeit import default_timer
 
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render, reverse
+from django.contrib.auth.models import User
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse, Http404
+from django.shortcuts import render, reverse, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
@@ -14,6 +15,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
+from django.core.cache import cache
 
 from .common import save_csv_products
 from .forms import ProductForm
@@ -163,6 +165,7 @@ class OrderDetailView(PermissionRequiredMixin, DetailView):
         .select_related("user")
         .prefetch_related("products")
     )
+    
 
 
 class ProductsDataExportView(View):
@@ -178,3 +181,48 @@ class ProductsDataExportView(View):
             for product in products
         ]
         return JsonResponse({"products": products_data})
+    
+    
+class UserOrdersListView(LoginRequiredMixin, ListView):
+    """ CBV для отображения списка заказов пользователя. """
+    
+    template_name = "shopapp/user_orders_list.html"
+    model = User
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(pk=self.kwargs["user_id"]).first()
+    
+    def get(self, *args, **kwargs):
+        self.owner = get_object_or_404(User, pk=self.kwargs["user_id"])
+        response = super().get(*args, **kwargs)
+        return response
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["owner"] = self.owner
+        return context
+        
+
+class UserOrdersExportView(View):
+    """ CBV для экспорта заказов пользователя в JSON формате. """
+    
+    def get(self, request: HttpRequest, user_id) -> JsonResponse:
+        self.owner = get_object_or_404(User, pk=user_id)
+        cache_key = f"user_orders_data_export_{self.owner.pk}"
+        orders_data = cache.get(cache_key)
+        if orders_data is None:
+            orders_data = [
+                {
+                    "pk": i_order.pk,
+                    "delivery_address": i_order.delivery_address,
+                    "promocode": i_order.promocode,
+                    "created_at": i_order.created_at,
+                    "products": [ProductSerializer(i_product).data for i_product in i_order.products.order_by('pk').all()],
+                    "receipt": i_order.receipt.path
+                }
+                for i_order in self.owner.orders.order_by('pk').all()
+            ]
+        cache.set(cache_key, orders_data, 60 * 3)
+        return JsonResponse({"user_orders": orders_data})
+        
